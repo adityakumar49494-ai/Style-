@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>90s Style Designer - Throwback Outfit Creator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            font-weight: bold;
+            letter-spacing: 3px;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .photo-area {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        #photoCanvas {
+            width: 100%;
+            max-width: 500px;
+            height: 600px;
+            border: 5px solid #ff6b6b;
+            border-radius: 15px;
+            background: #f0f0f0;
+            display: block;
+            margin: 0 auto 20px;
+            cursor: grab;
+        }
+
+        #photoCanvas:active {
+            cursor: grabbing;
+        }
+
+        .upload-area {
+            border: 3px dashed #4ecdc4;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background: rgba(255,255,255,0.8);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover {
+            border-color: #ff6b6b;
+            background: rgba(255,255,255,1);
+        }
+
+        .upload-area.dragover {
+            border-color: #45b7d1;
+            background: rgba(69,183,209,0.1);
+        }
+
+        #photoInput {
+            display: none;
+        }
+
+        .upload-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255,107,107,0.4);
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-3px);
+        }
+
+        .controls-panel {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            height: fit-content;
+        }
+
+        .control-section {
+            margin-bottom: 25px;
+        }
+
+        .control-section h3 {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            border-bottom: 2px solid #4ecdc4;
+            padding-bottom: 5px;
+        }
+
+        .clothing-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .clothing-item {
+            aspect-ratio: 1;
+            border-radius: 10px;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .clothing-item:hover {
+            transform: scale(1.05);
+            border-color: #ff6b6b;
+            box-shadow: 0 5px 20px rgba(255,107,107,0.3);
+        }
+
+        .clothing-item.active {
+            border-color: #45b7d1;
+            box-shadow: 0 0 0 3px rgba(69,183,209,0.5);
+        }
+
+        .color-picker {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .color-swatch {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 3px solid white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .color-swatch:hover,
+        .color-swatch.active {
+            transform: scale(1.2);
+            box-shadow: 0 0 0 3px #ff6b6b;
+        }
+
+        .slider-group {
+            margin: 15px 0;
+        }
+
+        .slider-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ff6b6b;
+            cursor: pointer;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #4ecdc4, #6cd3c9);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🕹️ 90s Style Designer</h1>
+            <p class="subtitle">Design fly outfits & try them on your photo!</p>
+        </header>
+
+        <div class="main-grid">
+            <div class="photo-area">
+                <div class="upload-area" id="uploadArea">
+                    <input type="file" id="photoInput" accept="image/*">
+                    <button class="upload-btn" onclick="document.getElementById('photoInput').click()">
+                        📸 Upload Your Photo
+                    </button>
+                    <p style="margin-top: 15px; color: #666; font-size: 0.9em;">
+                        or drag & drop your image here
+                    </p>
+                </div>
+                <canvas id="photoCanvas"></canvas>
+                <div style="text-align: center; color: #666;">
+                    <small>Drag to rotate • Scroll to zoom • Click clothes to try on</small>
+                </div>
+            </div>
+
+            <div class="controls-panel">
+                <div class="control-section">
+                    <h3>👕 Tops</h3>
+                    <div class="clothing-grid">
+                        <div class="clothing-item" data-type="top" data-style="graphic-tee" style="background: linear-gradient(45deg, #ff4757, #ff6b9d);"></div>
+                        <div class="clothing-item" data-type="top" data-style="flannel" style="background: linear-gradient(45deg, #2f3542, #57606f, #747d8c);"></div>
+                        <div class="clothing-item" data-type="top" data-style="crop-top" style="background: linear-gradient(135deg, #00b894, #00cec9);"></div>
+                        <div class="clothing-item" data-type="top" data-style="denim-jacket" style="background: linear-gradient(45deg, #386641, #5a7d3c);"></div>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h3>👖 Bottoms</h3>
+                    <div class="clothing-grid">
+                        <div class="clothing-item" data-type="bottom" data-style="baggy-jeans" style="background: linear-gradient(45deg, #2c3e50, #34495e);"></div>
+                        <div class="clothing-item" data-type="bottom" data-style="cargo-pants" style="background: linear-gradient(45deg, #606c88, #3f4c6b);"></div>
+                        <div class="clothing-item" data-type="bottom" data-style="skater-shorts" style="background: linear-gradient(135deg, #e17055, #d63031);"></div>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h3>🎨 Colors</h3>
+                    <div class="color-picker" id="colorPicker">
+                        <div class="color-swatch active" data-color="#ff4757" style="background: #ff4757;"></div>
+                        <div class="color-swatch" data-color="#00b894" style="background: #00b894;"></div>
+                        <div class="color-swatch" data-color="#00cec9" style="background: #00cec9;"></div>
+                        <div class="color-swatch" data-color="#fdcb6e" style="background: #fdcb6e;"></div>
+                        <div class="color-swatch" data-color="#6c5ce7" style="background: #6c5ce7;"></div>
+                        <div class="color-swatch" data-color="#a29bfe" style="background: #a29bfe;"></div>
+                        <div class="color-swatch" data-color="#fd79a8" style="background: #fd79a8;"></div>
+                        <div class="color-swatch" data-color="#00b894" style="background: #00b894;"></div>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <div class="slider-group">
+                        <label>Size: <span id="sizeValue">100</span>%</label>
+                        <input type="range" id="sizeSlider" min="50" max="200" value="100">
+                    </div>
+                    <div class="slider-group">
+                        <label>Rotation: <span id="rotationValue">0</span>°</label>
+                        <input type="range" id="rotationSlider" min="-30" max="30" value="0">
+                    </div>
+                    <div class="slider-group">
+                        <label>Opacity: <span id="opacityValue">100</span>%</label>
+                        <input type="range" id="opacitySlider" min="20" max="100" value="100">
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="clearOutfit()">🗑️ Clear Outfit</button>
+                    <button class="btn btn-secondary" onclick="saveOutfit()">💾 Save Outfit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class NinetiesDesigner {
+            constructor() {
+                this.canvas = document.getElementById('photoCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.image = new Image();
+                this.clothingLayers = [];
+                this.currentColor = '#ff4757';
+                this.isDragging = false;
+                this.dragStart = { x: 0, y: 0 };
+                this.currentLayer = null;
+
+                this.init();
+            }
+
+            init() {
+                this.setupCanvas();
+                this.setupEventListeners();
+                this.setupClothingItems();
+                this.setupSliders();
+                this.setupColorPicker();
+                this.setupDragDrop();
+            }
+
+            setupCanvas() {
+                this.canvas.width = 500;
+                this.canvas.height = 600;
+                this.scale = 1;
+                this.offsetX = 0;
+                this.offsetY = 0;
+            }
+
+            setupEventListeners() {
+                this.canvas.addEventListener('mousedown', (e) => this.startDrag(e));
+                this.canvas.addEventListener('mousemove', (e) => this.drag(e));
+                this.canvas.addEventListener('mouseup', () => this.stopDrag());
+                this.canvas.addEventListener('wheel', (e) => this.zoom(e));
+                
+                document.getElementById('photoInput').addEventListener('change', (e) => this.loadImage(e.target.files[0]));
+            }
+
+            setupDragDrop() {
+                const uploadArea = document.getElementById('uploadArea');
+                
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    uploadArea.addEventListener(eventName, preventDefaults, false);
+                });
+
+                function preventDefaults(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    uploadArea.addEventListener(eventName, () => uploadArea.classList.add('dragover'), false);
+                });
+
+                ['dragleave', 'drop'].forEach(eventName => {
+                    uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('dragover'), false);
+                });
+
+                uploadArea.addEventListener('drop', (e) => {
+                    this.loadImage(e.dataTransfer.files[0]);
+                }, false);
+            }
+
+            loadImage(file) {
+                if (!file || !file.type.startsWith('image/')) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.image.src = e.target.result;
+                    this.image.onload = () => {
+                        this.draw();
+                    };
+                };
+                reader.readAsDataURL(file);
+            }
+
+            setupClothingItems() {
+                document.querySelectorAll('.clothing-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        this.addClothingLayer(e.currentTarget.dataset.type, e.currentTarget.dataset.style);
+                        this.setActiveItem(e.currentTarget);
+                    });
+                });
+            }
+
+            setActiveItem(activeItem) {
+                document.querySelectorAll('.clothing-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                activeItem.classList.add('active');
+            }
+
+            addClothingLayer(type, style) {
+                const clothingPatterns = {
+                    'graphic-tee': this.createGraphicTee,
+                    'flannel': this.createFlannel,
+                    'crop-top': this.createCropTop,
+                    'denim-jacket': this.createDenimJacket,
+                    'baggy-jeans': this.createBaggyJeans,
+                    'cargo-pants': this.createCargoPants,
+                    'skater-shorts': this.createSkaterShorts
+                };
+
+                const createPattern = clothingPatterns[style];
+                if (createPattern) {
+                    const layer = {
+                        id: Date.now(),
+                        type,
+                        style,
+                        pattern: createPattern.call(this),
+                        x: this.canvas.width / 2,
+                        y: this.canvas.height / 2,
+                        scale: 0.8,
+                        rotation: 0,
+                        opacity: 1,
+                        color: this.currentColor
+                    };
+                    this.clothingLayers.push(layer);
+                    this.currentLayer = layer;
+                    this.updateSlidersForLayer(layer);
+                    this.draw();
+                }
+            }
+
+            createGraphicTee() {
+                const canvas = document.createElement('canvas');
+                canvas.width = 200;
+                canvas.height = 250;
+                const ctx = canvas.getContext('2d');
+                
+                // Tee shape
+                ctx.fillStyle = this.currentColor;
+                ctx.fillRect(20, 50, 160, 150);
+                ctx.fillRect(60, 20, 80, 60);
+                
+                // Graphic
+                const gradient = ctx.createLinearGradient(100, 80, 100, 140);
+                gradient.addColorStop(0, '#fff');
+                gradient.addColorStop(1, '#ddd');
+                ctx.fillStyle = gradient;
+                ctx.font = 'bold 20px Arial';
+                ctx.fillText('90s', 85, 110);
+                ctx.font = 'bold 16px Arial';
+                ctx.fillText('VIBES', 82, 135);
+                
+                return canvas;
+            }
+
+            createFlannel() {
+                const canvas = document.createElement('canvas');
+                canvas.width = 220;
+                canvas.height = 280;
+                const ctx = canvas.getContext('2d');
+                
+                // Plaid pattern
+                for (let i = 0; i < 10; i++) {
+                    ctx.fillStyle =
